@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Options;
 
+use Monolog\Formatter\LogstashFormatter;
 use Zend\Stdlib\AbstractOptions;
 
 class LogstashFormatterOptions extends AbstractOptions
@@ -29,7 +30,7 @@ class LogstashFormatterOptions extends AbstractOptions
     /**
      * @var int
      */
-    protected $version = LogstashFormatterOptions::V0;
+    protected $version = LogstashFormatter::V0;
 
     /**
      * @param string $applicationName
