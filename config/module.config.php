@@ -3,6 +3,10 @@
 use Monolog\Formatter;
 
 return [
+    'monolog_error_handler' => [
+        'enabled' => false,
+    ],
+
     'monolog' => [
         'logger' => [
             'default' => [
@@ -10,7 +14,7 @@ return [
                 'tags'       => [],
                 'processors' => [],
                 'handlers'   => [],
-            ]
+            ],
         ],
 
         'processor' => [
