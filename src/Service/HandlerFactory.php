@@ -10,8 +10,6 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class HandlerFactory extends AbstractFactory
 {
     /**
-     * Create service
-     *
      * @param ServiceLocatorInterface $serviceLocator
      * @return HandlerInterface
      */

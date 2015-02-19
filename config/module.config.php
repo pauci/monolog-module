@@ -32,6 +32,7 @@ return [
         'handler' => [
             'browserconsole' => [],
             'chromephp'      => [],
+            'elasticsearch'  => [],
             'fingerscrossed' => [],
             'firephp'        => [],
             'null'           => [],

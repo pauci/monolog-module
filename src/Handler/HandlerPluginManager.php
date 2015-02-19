@@ -24,6 +24,7 @@ class HandlerPluginManager extends AbstractPluginManager
     ];
 
     protected $factories = [
+        'elasticsearch'    => Service\ElasticSearchHandlerFactory::class,
         'fingerscrossed'   => Service\FingersCrossedHandlerFactory::class,
         'group'            => Service\GroupHandlerFactory::class,
         'mongodb'          => Service\MongoDBHandlerFactory::class,
