@@ -2,6 +2,7 @@
 
 namespace MonologModuleTest;
 
+use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\Service\ServiceListenerFactory;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Mvc\Service\ServiceManagerConfig;
@@ -11,7 +12,9 @@ use Zend\Mvc\Service\ServiceManagerConfig;
  */
 class ServiceManagerFactory
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected static $config = [];
 
     /**
@@ -37,7 +40,7 @@ class ServiceManagerFactory
         $serviceManager->setService('ApplicationConfig', static::$config);
         $serviceManager->setFactory('ServiceListener', ServiceListenerFactory::class);
 
-        /** @var \Zend\ModuleManager\ModuleManager $moduleManager */
+        /** @var ModuleManager $moduleManager */
         $moduleManager = $serviceManager->get('ModuleManager');
         $moduleManager->loadModules();
 
