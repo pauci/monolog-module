@@ -1,14 +1,8 @@
 {
-    "name": "sygic/monolog-module",
+    "name": "pauci/monolog-module",
     "description": "Zend Framework 2 Module that provides functionality for Monolog library",
     "type": "library",
-    "license": "proprietary",
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://satis.ssd.sygic.local"
-        }
-    ],
+    "license": "MIT",
     "require": {
         "php": ">=5.5",
         "monolog/monolog": "~1.9",
@@ -22,6 +16,11 @@
     "autoload": {
         "psr-4": {
             "MonologModule\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
         }
     }
 }
