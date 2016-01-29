@@ -16,12 +16,12 @@
     "require": {
         "php": "^5.5 || ^7.0",
         "monolog/monolog": "~1.9",
-        "zendframework/zend-modulemanager": "~2.3",
         "zendframework/zend-mvc": "~2.3",
         "zendframework/zend-servicemanager": "~2.3",
         "zendframework/zend-stdlib": "~2.3"
     },
     "require-dev": {
+        "zendframework/zendframework": "~2.3",
         "phpunit/phpunit": "~4.0",
         "predis/predis": "~1.0",
         "ruflin/elastica": "~1.4"
