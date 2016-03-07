@@ -65,9 +65,12 @@ return [
 
     'service_manager' => [
         'invokables' => [
-            MonologModule\Processor\ProcessorPluginManager::class => MonologModule\Processor\ProcessorPluginManager::class,
-            MonologModule\Handler\HandlerPluginManager::class     => MonologModule\Handler\HandlerPluginManager::class,
-            MonologModule\Formatter\FormatterPluginManager::class => MonologModule\Formatter\FormatterPluginManager::class,
+        ],
+        'factories' => [
+            MonologModule\Processor\ProcessorPluginManager::class => MonologModule\Service\PluginManagerFactory::class,
+            MonologModule\Handler\HandlerPluginManager::class     => MonologModule\Service\PluginManagerFactory::class,
+            MonologModule\Formatter\FormatterPluginManager::class => MonologModule\Service\PluginManagerFactory::class,
+
         ],
         'abstract_factories' => [
             'Monolog' => MonologModule\ServiceFactory\AbstractLoggerFactory::class,

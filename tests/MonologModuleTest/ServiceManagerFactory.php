@@ -3,7 +3,6 @@
 namespace MonologModuleTest;
 
 use Zend\ModuleManager\ModuleManager;
-use Zend\Mvc\Service\ServiceListenerFactory;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Mvc\Service\ServiceManagerConfig;
 
@@ -38,7 +37,6 @@ class ServiceManagerFactory
             )
         );
         $serviceManager->setService('ApplicationConfig', static::$config);
-        $serviceManager->setFactory('ServiceListener', ServiceListenerFactory::class);
 
         /** @var ModuleManager $moduleManager */
         $moduleManager = $serviceManager->get('ModuleManager');
