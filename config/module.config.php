@@ -67,9 +67,9 @@ return [
         'invokables' => [
         ],
         'factories' => [
-            MonologModule\Processor\ProcessorPluginManager::class => MonologModule\Service\PluginManagerFactory::class,
-            MonologModule\Handler\HandlerPluginManager::class     => MonologModule\Service\PluginManagerFactory::class,
-            MonologModule\Formatter\FormatterPluginManager::class => MonologModule\Service\PluginManagerFactory::class,
+            MonologModule\Formatter\FormatterPluginManager::class => MonologModule\Service\FormatterPluginManagerFactory::class,
+            MonologModule\Handler\HandlerPluginManager::class     => MonologModule\Service\HandlerPluginManagerFactory::class,
+            MonologModule\Processor\ProcessorPluginManager::class => MonologModule\Service\ProcessorPluginManagerFactory::class,
 
         ],
         'abstract_factories' => [
