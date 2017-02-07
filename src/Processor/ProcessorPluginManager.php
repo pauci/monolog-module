@@ -3,57 +3,61 @@
 namespace MonologModule\Processor;
 
 use Monolog\Processor;
-use MonologModule\Exception;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception\InvalidServiceException;
+use Zend\ServiceManager\Factory\InvokableFactory;
 
 class ProcessorPluginManager extends AbstractPluginManager
 {
     /**
-     * @var array
+     * {@inheritDoc}
      */
-    protected $invokableClasses = [
-        'processid'     => Processor\ProcessIdProcessor::class,
-        'psrlogmessage' => Processor\PsrLogMessageProcessor::class,
+    protected $aliases = [
+        'git'             => Processor\GitProcessor::class,
+        'introspection'   => Processor\IntrospectionProcessor::class,
+        'memorypeakusage' => Processor\MemoryPeakUsageProcessor::class,
+        'memoryusage'     => Processor\MemoryUsageProcessor::class,
+        'processid'       => Processor\ProcessIdProcessor::class,
+        'psrlogmessage'   => Processor\PsrLogMessageProcessor::class,
+        'tag'             => Processor\TagProcessor::class,
+        'uid'             => Processor\UidProcessor::class,
+        'web'             => Processor\WebProcessor::class,
     ];
 
     /**
-     * @var array
+     * {@inheritDoc}
      */
     protected $factories = [
-        'git'             => Service\GitProcessorFactory::class,
-        'introspection'   => Service\IntrospectionProcessorFactory::class,
-        'memorypeakusage' => Service\MemoryPeakUsageProcessorFactory::class,
-        'memoryusage'     => Service\MemoryUsageProcessorFactory::class,
-        'tag'             => Service\TagProcessorFactory::class,
-        'uid'             => Service\UidProcessorFactory::class,
-        'web'             => Service\WebProcessorFactory::class,
+        Processor\GitProcessor::class             => Service\GitProcessorFactory::class,
+        Processor\IntrospectionProcessor::class   => Service\IntrospectionProcessorFactory::class,
+        Processor\MemoryPeakUsageProcessor::class => Service\MemoryPeakUsageProcessorFactory::class,
+        Processor\MemoryUsageProcessor::class     => Service\MemoryUsageProcessorFactory::class,
+        Processor\ProcessIdProcessor::class       => InvokableFactory::class,
+        Processor\PsrLogMessageProcessor::class   => InvokableFactory::class,
+        Processor\TagProcessor::class             => Service\TagProcessorFactory::class,
+        Processor\UidProcessor::class             => Service\UidProcessorFactory::class,
+        Processor\WebProcessor::class             => Service\WebProcessorFactory::class,
     ];
 
     /**
-     * Allow many processors of same type
-     *
-     * @var bool
+     * {@inheritDoc}
      */
-    protected $shareByDefault = false;
+    protected $sharedByDefault = false;
 
     /**
-     * Validate the plugin
-     *
-     * Checks that the processor is callable
-     *
-     * @param  mixed $plugin
-     * @throws Exception\InvalidArgumentException
-     * @return void
+     * {@inheritDoc}
      */
-    public function validatePlugin($plugin)
+    public function validate($instance)
     {
-        if (is_callable($plugin)) {
-            return; // we're okay
+        if (is_callable($instance)) {
+            return;
         }
 
-        throw new Exception\InvalidArgumentException(sprintf(
-            'Plugin of type %s is invalid; must be callable',
-            is_object($plugin) ? get_class($plugin) : gettype($plugin)
+        throw new InvalidServiceException(sprintf(
+            'Plugin manager "%s" expected an instance of type "%s", but "%s" was received',
+            __CLASS__,
+            $this->instanceOf,
+            is_object($instance) ? get_class($instance) : gettype($instance)
         ));
     }
 }

@@ -24,8 +24,9 @@ class FormatterFactory extends AbstractFactory
         $type = isset($options['type']) ? $options['type'] : $this->getName();
         unset($options['type']);
 
-        return $container->get(FormatterPluginManager::class)
-            ->get($type, $options);
+        /** @var FormatterPluginManager $pluginManager */
+        $pluginManager = $container->get(FormatterPluginManager::class);
+        $pluginManager->get($type, $options);
     }
 
     public function createService(ServiceLocatorInterface $serviceLocator)

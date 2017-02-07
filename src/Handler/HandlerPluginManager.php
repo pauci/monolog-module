@@ -2,59 +2,84 @@
 
 namespace MonologModule\Handler;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Processor\TagProcessor;
-use MonologModule\Exception;
 use MonologModule\Handler\Options\CommonHandlerOptions;
 use Zend\ServiceManager\AbstractPluginManager;
-use Zend\ServiceManager\ConfigInterface;
+use Zend\ServiceManager\Factory\InvokableFactory;
 
 class HandlerPluginManager extends AbstractPluginManager
 {
-    protected $invokableClasses = [
-        'browserconsole' => Handler\BrowserConsoleHandler::class,
-        'chromephp'      => Handler\ChromePHPHandler::class,
-        'exceptiontest'  => Handler\ExceptionTestHandler::class,
-        'firephp'        => Handler\FirePHPHandler::class,
-        'null'           => Handler\NullHandler::class,
-        'test'           => Handler\TestHandler::class,
-        'zendmonitor'    => Handler\ZendMonitorHandler::class,
+    /**
+     * {@inheritDoc}
+     */
+    protected $aliases = [
+        'browserconsole'   => Handler\BrowserConsoleHandler::class,
+        'chromephp'        => Handler\ChromePHPHandler::class,
+        'elasticsearch'    => Handler\ElasticSearchHandler::class,
+        'exceptiontest'    => Handler\ExceptionTestHandler::class,
+        'fingerscrossed'   => Handler\FingersCrossedHandler::class,
+        'firephp'          => Handler\FirePHPHandler::class,
+        'group'            => Handler\GroupHandler::class,
+        'mongodb'          => Handler\MongoDBHandler::class,
+        'null'             => Handler\NullHandler::class,
+        'redis'            => Handler\RedisHandler::class,
+        'stream'           => Handler\StreamHandler::class,
+        'test'             => Handler\TestHandler::class,
+        'whatfailuregroup' => Handler\WhatFailureGroupHandler::class,
+        'zendmonitor'      => Handler\ZendMonitorHandler::class,
     ];
 
+    /**
+     * {@inheritDoc}
+     */
     protected $factories = [
-        'elasticsearch'    => Service\ElasticSearchHandlerFactory::class,
-        'fingerscrossed'   => Service\FingersCrossedHandlerFactory::class,
-        'group'            => Service\GroupHandlerFactory::class,
-        'mongodb'          => Service\MongoDBHandlerFactory::class,
-        'redis'            => Service\RedisHandlerFactory::class,
-        'stream'           => Service\StreamHandlerFactory::class,
-        'whatfailuregroup' => Service\WhatFailureGroupHandlerFactory::class,
+        Handler\BrowserConsoleHandler::class   => InvokableFactory::class,
+        Handler\ChromePHPHandler::class        => InvokableFactory::class,
+        Handler\ElasticSearchHandler::class    => Service\ElasticSearchHandlerFactory::class,
+        Handler\ExceptionTestHandler::class    => InvokableFactory::class,
+        Handler\FingersCrossedHandler::class   => Service\FingersCrossedHandlerFactory::class,
+        Handler\FirePHPHandler::class          => InvokableFactory::class,
+        Handler\GroupHandler::class            => Service\GroupHandlerFactory::class,
+        Handler\MongoDBHandler::class          => Service\MongoDBHandlerFactory::class,
+        Handler\NullHandler::class             => InvokableFactory::class,
+        Handler\RedisHandler::class            => Service\RedisHandlerFactory::class,
+        Handler\StreamHandler::class           => Service\StreamHandlerFactory::class,
+        Handler\TestHandler::class             => InvokableFactory::class,
+        Handler\WhatFailureGroupHandler::class => Service\WhatFailureGroupHandlerFactory::class,
+        Handler\ZendMonitorHandler::class      => InvokableFactory::class,
     ];
 
     /**
-     * Allow many handlers of same type
-     *
-     * @var bool
+     * {@inheritDoc}
      */
-    protected $shareByDefault = false;
+    protected $sharedByDefault = false;
 
     /**
-     * @param ConfigInterface $configuration
+     * {@inheritDoc}
      */
-    public function __construct(ConfigInterface $configuration = null)
+    protected $instanceOf = HandlerInterface::class;
+
+    /**
+     * @param ContainerInterface $container
+     * @param array $config
+     */
+    public function __construct(ContainerInterface $container, array $config = [])
     {
-        parent::__construct($configuration);
+        parent::__construct($container, $config);
 
         $this->addInitializer([$this, 'injectFormatter']);
         $this->addInitializer([$this, 'injectProcessors']);
     }
 
     /**
+     * @param ContainerInterface $container
      * @param HandlerInterface $handler
      */
-    public function injectFormatter($handler)
+    public function injectFormatter(ContainerInterface $container, HandlerInterface $handler)
     {
         if (empty($this->creationOptions['formatter'])) {
             return;
@@ -69,9 +94,10 @@ class HandlerPluginManager extends AbstractPluginManager
     }
 
     /**
+     * @param ContainerInterface $container
      * @param HandlerInterface $handler
      */
-    public function injectProcessors($handler)
+    public function injectProcessors(ContainerInterface $container, HandlerInterface $handler)
     {
         if (!empty($this->creationOptions['tags'])) {
             $tagProcessor = new TagProcessor($this->creationOptions['tags']);
@@ -108,26 +134,5 @@ class HandlerPluginManager extends AbstractPluginManager
         }
 
         return $instance;
-    }
-
-    /**
-     * Validate the plugin
-     *
-     * Checks that the handler is an instance of HandlerInterface
-     *
-     * @param  mixed $plugin
-     * @throws Exception\InvalidHandlerException
-     * @return void
-     */
-    public function validatePlugin($plugin)
-    {
-        if ($plugin instanceof HandlerInterface) {
-            return; // we're okay
-        }
-
-        throw new Exception\InvalidHandlerException(sprintf(
-            'Plugin of type %s is invalid; must implement Monolog\Handler\HandlerInterface',
-            is_object($plugin) ? get_class($plugin) : gettype($plugin)
-        ));
     }
 }

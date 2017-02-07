@@ -3,9 +3,8 @@
 namespace MonologModule\Service;
 
 use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\MutableCreationOptionsInterface;
 
-abstract class AbstractPluginFactory implements FactoryInterface, MutableCreationOptionsInterface
+abstract class AbstractPluginFactory implements FactoryInterface
 {
     /**
      * @var array

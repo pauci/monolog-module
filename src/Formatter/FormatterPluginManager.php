@@ -4,61 +4,54 @@ namespace MonologModule\Formatter;
 
 use Monolog\Formatter;
 use Monolog\Formatter\FormatterInterface;
-use MonologModule\Exception;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Factory\InvokableFactory;
 
 class FormatterPluginManager extends AbstractPluginManager
 {
     /**
-     * @var array
+     * {@inheritDoc}
      */
-    protected $invokableClasses = [
-        'chromephp' => Formatter\ChromePHPFormatter::class,
+    protected $aliases = [
+        'chromephp'   => Formatter\ChromePHPFormatter::class,
+        'elastica'    => Formatter\ElasticaFormatter::class,
+        'flowdock'    => Formatter\FlowdockFormatter::class,
+        'gelfmessage' => Formatter\GelfMessageFormatter::class,
+        'html'        => Formatter\HtmlFormatter::class,
+        'json'        => Formatter\JsonFormatter::class,
+        'line'        => Formatter\LineFormatter::class,
+        'loggly'      => Formatter\LogglyFormatter::class,
+        'logstash'    => Formatter\LogstashFormatter::class,
+        'normalizer'  => Formatter\NormalizerFormatter::class,
+        'scalar'      => Formatter\ScalarFormatter::class,
+        'wildfire'    => Formatter\WildfireFormatter::class,
     ];
 
     /**
-     * @var array
+     * {@inheritDoc}
      */
     protected $factories = [
-        'elastica'    => Service\ElasticaFormatterFactory::class,
-        'flowdock'    => Service\FlowdockFormatterFactory::class,
-        'gelfmessage' => Service\GelfMessageFormatterFactory::class,
-        'html'        => Service\HtmlFormatterFactory::class,
-        'json'        => Service\JsonFormatterFactory::class,
-        'line'        => Service\LineFormatterFactory::class,
-        'loggly'      => Service\LogglyFormatterFactory::class,
-        'logstash'    => Service\LogstashFormatterFactory::class,
-        'normalizer'  => Service\NormalizerFormatterFactory::class,
-        'scalar'      => Service\ScalarFormatterFactory::class,
-        'wildfire'    => Service\WildfireFormatterFactory::class,
+        Formatter\ChromePHPFormatter::class   => InvokableFactory::class,
+        Formatter\ElasticaFormatter::class    => Service\ElasticaFormatterFactory::class,
+        Formatter\FlowdockFormatter::class    => Service\FlowdockFormatterFactory::class,
+        Formatter\GelfMessageFormatter::class => Service\GelfMessageFormatterFactory::class,
+        Formatter\HtmlFormatter::class        => Service\HtmlFormatterFactory::class,
+        Formatter\JsonFormatter::class        => Service\JsonFormatterFactory::class,
+        Formatter\LineFormatter::class        => Service\LineFormatterFactory::class,
+        Formatter\LogglyFormatter::class      => Service\LogglyFormatterFactory::class,
+        Formatter\LogstashFormatter::class    => Service\LogstashFormatterFactory::class,
+        Formatter\NormalizerFormatter::class  => Service\NormalizerFormatterFactory::class,
+        Formatter\ScalarFormatter::class      => Service\ScalarFormatterFactory::class,
+        Formatter\WildfireFormatter::class    => Service\WildfireFormatterFactory::class,
     ];
 
     /**
-     * Allow many formatters of same type
-     *
-     * @var bool
+     * {@inheritDoc}
      */
-    protected $shareByDefault = false;
+    protected $sharedByDefault = false;
 
     /**
-     * Validate the plugin
-     *
-     * Checks that the handler is an instance of FormatterInterface
-     *
-     * @param  mixed $plugin
-     * @throws Exception\InvalidArgumentException
-     * @return void
+     * {@inheritDoc}
      */
-    public function validatePlugin($plugin)
-    {
-        if ($plugin instanceof FormatterInterface) {
-            return; // we're okay
-        }
-
-        throw new Exception\InvalidArgumentException(sprintf(
-            'Plugin of type %s is invalid; must implement %s',
-            is_object($plugin) ? get_class($plugin) : gettype($plugin),
-            FormatterInterface::class
-        ));
-    }
+    protected $instanceOf = FormatterInterface::class;
 }
