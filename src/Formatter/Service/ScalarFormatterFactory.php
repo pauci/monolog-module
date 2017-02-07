@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\ScalarFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\NormalizerFormatterOptions;
@@ -12,15 +13,23 @@ class ScalarFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return ScalarFormatter
+     * @internal param ServiceLocatorInterface $serviceLocator
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new NormalizerFormatterOptions($this->creationOptions);
+        $formatterOptions = new NormalizerFormatterOptions($options);
 
         return new ScalarFormatter(
-            $options->getDateFormat()
+            $formatterOptions->getDateFormat()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, ScalarFormatter::class, $this->creationOptions);
     }
 }

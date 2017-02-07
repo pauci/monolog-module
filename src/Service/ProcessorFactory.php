@@ -2,6 +2,7 @@
 
 namespace MonologModule\Service;
 
+use Interop\Container\ContainerInterface;
 use MonologModule\Processor\ProcessorPluginManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -10,17 +11,24 @@ class ProcessorFactory extends AbstractFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return callable
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = $this->getOptions($serviceLocator, 'processor');
+        $options = $this->getOptions($container, 'processor');
 
         $type = isset($options['type']) ? $options['type'] : $this->getName();
         unset($options['type']);
 
-        return $serviceLocator->get(ProcessorPluginManager::class)
+        return $container->get(ProcessorPluginManager::class)
             ->get($type, $options);
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, 'Monolog\Processor');
     }
 }

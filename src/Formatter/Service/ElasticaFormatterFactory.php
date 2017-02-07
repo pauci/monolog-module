@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\ElasticaFormatter;
 use MonologModule\Exception\InvalidArgumentException;
 use MonologModule\Formatter\Options\ElasticaFormatterOptions;
@@ -13,15 +14,17 @@ class ElasticaFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return ElasticaFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new ElasticaFormatterOptions($this->creationOptions);
+        $formatterOptions = new ElasticaFormatterOptions($options);
 
-        $index = $options->getIndex();
-        $type  = $options->getType();
+        $index = $formatterOptions->getIndex();
+        $type = $formatterOptions->getType();
 
         if (!$index) {
             throw new InvalidArgumentException('Elastica formatter must have an index specified');
@@ -31,5 +34,10 @@ class ElasticaFormatterFactory extends AbstractPluginFactory
         }
 
         return new ElasticaFormatter($index, $type);
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, ElasticaFormatter::class, $this->creationOptions);
     }
 }

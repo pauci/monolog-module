@@ -2,6 +2,7 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\GroupHandler;
 use MonologModule\Handler\HandlerPluginManager;
 use MonologModule\Handler\Options\GroupHandlerOptions;
@@ -13,26 +14,36 @@ class GroupHandlerFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return GroupHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new GroupHandlerOptions($this->creationOptions);
+        $handlerOptions = new GroupHandlerOptions($options);
 
         $handlers = [];
-        foreach ($options->getHandlers() as $handler) {
+        foreach ($handlerOptions->getHandlers() as $handler) {
             if (is_string($handler)) {
-                $handler = $serviceLocator->get("monolog.handler.$handler");
+                $handler = $container->get("monolog.handler.$handler");
             } elseif (is_array($handler) && !empty($handler['type'])) {
                 $type = $handler['type'];
                 unset($handler['type']);
-                $handler = $serviceLocator->get(HandlerPluginManager::class)->get($type, $handler);
+                $handler = $container->get(HandlerPluginManager::class)->get($type, $handler);
             }
             $handlers[] = $handler;
         }
 
-        return $this->create($handlers, $options->getBubble());
+        return $this->create(
+            $handlers,
+            $handlerOptions->getBubble()
+        );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, GroupHandler::class, $this->creationOptions);
     }
 
     /**

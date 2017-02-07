@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\LogglyFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\LogglyFormatterOptions;
@@ -12,16 +13,23 @@ class LogglyFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return LogglyFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new LogglyFormatterOptions($this->creationOptions);
+        $formatterOptions = new LogglyFormatterOptions($options);
 
         return new LogglyFormatter(
-            $options->getBatchMode(),
-            $options->getAppendNewline()
+            $formatterOptions->getBatchMode(),
+            $formatterOptions->getAppendNewline()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, LogglyFormatter::class, $this->creationOptions);
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-use Monolog\Formatter;
-
 return [
     'monolog_error_handler' => [
         'enabled' => false,
@@ -10,56 +8,56 @@ return [
     'monolog' => [
         'logger' => [
             'default' => [
-                'name'       => 'default',
-                'tags'       => [],
+                'name' => 'default',
+                'tags' => [],
                 'processors' => [],
-                'handlers'   => [],
+                'handlers' => [],
             ],
         ],
 
         'processor' => [
-            'git'             => [],
-            'introspection'   => [],
+            'git' => [],
+            'introspection' => [],
             'memorypeakusage' => [],
-            'memoryusage'     => [],
-            'processid'       => [],
-            'psrlog'          => [],
-            'tag'             => [],
-            'uid'             => [],
-            'web'             => [],
+            'memoryusage' => [],
+            'processid' => [],
+            'psrlog' => [],
+            'tag' => [],
+            'uid' => [],
+            'web' => [],
         ],
 
         'handler' => [
             'browserconsole' => [],
-            'chromephp'      => [],
-            'elasticsearch'  => [],
+            'chromephp' => [],
+            'elasticsearch' => [],
             'fingerscrossed' => [],
-            'firephp'        => [],
-            'null'           => [],
-            'redis'          => [],
-            'stream'         => [],
+            'firephp' => [],
+            'null' => [],
+            'redis' => [],
+            'stream' => [],
         ],
 
         'formatter' => [
-            'chromephp'   => [],
-            'elastica'    => [],
-            'flowdock'    => [],
+            'chromephp' => [],
+            'elastica' => [],
+            'flowdock' => [],
             'gelfmessage' => [],
-            'html'        => [],
-            'json'        => [],
-            'line'        => [],
-            'loggy'       => [],
-            'logstash'    => [],
-            'normalizer'  => [],
-            'scalar'      => [],
-            'wildfire'    => [],
+            'html' => [],
+            'json' => [],
+            'line' => [],
+            'loggy' => [],
+            'logstash' => [],
+            'normalizer' => [],
+            'scalar' => [],
+            'wildfire' => [],
         ],
     ],
 
     'monolog_factories' => [
-        'logger'    => MonologModule\Service\LoggerFactory::class,
+        'logger' => MonologModule\Service\LoggerFactory::class,
         'processor' => MonologModule\Service\ProcessorFactory::class,
-        'handler'   => MonologModule\Service\HandlerFactory::class,
+        'handler' => MonologModule\Service\HandlerFactory::class,
         'formatter' => MonologModule\Service\FormatterFactory::class,
     ],
 
@@ -68,7 +66,7 @@ return [
         ],
         'factories' => [
             MonologModule\Formatter\FormatterPluginManager::class => MonologModule\Service\FormatterPluginManagerFactory::class,
-            MonologModule\Handler\HandlerPluginManager::class     => MonologModule\Service\HandlerPluginManagerFactory::class,
+            MonologModule\Handler\HandlerPluginManager::class => MonologModule\Service\HandlerPluginManagerFactory::class,
             MonologModule\Processor\ProcessorPluginManager::class => MonologModule\Service\ProcessorPluginManagerFactory::class,
 
         ],

@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\LogstashFormatter;
 use MonologModule\Exception\InvalidArgumentException;
 use MonologModule\Formatter\Options\LogstashFormatterOptions;
@@ -13,24 +14,31 @@ class LogstashFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return LogstashFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new LogstashFormatterOptions($this->creationOptions);
+        $formatterOptions = new LogstashFormatterOptions($options);
 
-        $applicationName = $options->getApplicationName();
+        $applicationName = $formatterOptions->getApplicationName();
         if (!$applicationName) {
             throw new InvalidArgumentException('Logstash formatter must have an application name specified');
         }
 
         return new LogstashFormatter(
             $applicationName,
-            $options->getSystemName(),
-            $options->getExtraPrefix(),
-            $options->getContextPrefix(),
-            $options->getVersion()
+            $formatterOptions->getSystemName(),
+            $formatterOptions->getExtraPrefix(),
+            $formatterOptions->getContextPrefix(),
+            $formatterOptions->getVersion()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, LogstashFormatter::class, $this->creationOptions);
     }
 }

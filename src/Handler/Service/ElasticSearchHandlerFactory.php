@@ -2,35 +2,43 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\ElasticSearchHandler;
 use MonologModule\Handler\Options\ElasticSearchHandlerOptions;
 use MonologModule\Service\AbstractPluginFactory;
-use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class ElasticSearchHandlerFactory extends AbstractPluginFactory
 {
     /**
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return ElasticSearchHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new ElasticSearchHandlerOptions($this->creationOptions);
+        $handlerOptions = new ElasticSearchHandlerOptions($options);
 
-        $client = $options->getClient();
+        $client = $handlerOptions->getClient();
         if (is_string($client)) {
-            if ($serviceLocator instanceof AbstractPluginManager) {
-                $serviceLocator = $serviceLocator->getServiceLocator();
+            if ($container instanceof ServiceLocatorAwareInterface) {
+                $container = $container->getServiceLocator();
             }
-            $client = $serviceLocator->get($client);
+            $client = $container->get($client);
         }
 
         return new ElasticSearchHandler(
             $client,
-            $options->getOptions(),
-            $options->getLevel(),
-            $options->getBubble()
+            $handlerOptions->getOptions(),
+            $handlerOptions->getLevel(),
+            $handlerOptions->getBubble()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, ElasticSearchHandler::class, $this->creationOptions);
     }
 }

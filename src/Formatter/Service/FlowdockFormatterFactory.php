@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\FlowdockFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Exception\InvalidArgumentException;
@@ -13,15 +14,17 @@ class FlowdockFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return FlowdockFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new FlowdockFormatterOptions($this->creationOptions);
+        $formatterOptions = new FlowdockFormatterOptions($options);
 
-        $source      = $options->getSource();
-        $sourceEmail = $options->getSourceEmail();
+        $source = $formatterOptions->getSource();
+        $sourceEmail = $formatterOptions->getSourceEmail();
         if (!$source) {
             throw new InvalidArgumentException('Flowdock formatter must have a source specified');
         }
@@ -30,5 +33,10 @@ class FlowdockFormatterFactory extends AbstractPluginFactory
         }
 
         return new FlowdockFormatter($source, $sourceEmail);
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, FlowdockFormatter::class, $this->creationOptions);
     }
 }

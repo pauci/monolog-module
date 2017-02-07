@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\LineFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\LineFormatterOptions;
@@ -12,18 +13,25 @@ class LineFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $serviceLocator
+     * @param string $requestedName
+     * @param array $options
      * @return LineFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
-        $options = new LineFormatterOptions($this->creationOptions);
+        $formatterOptions = new LineFormatterOptions($options);
 
         return new LineFormatter(
-            $options->getFormat(),
-            $options->getDateFormat(),
-            $options->getAllowInlineLineBreaks(),
-            $options->getIgnoreEmptyContextAndExtra()
+            $formatterOptions->getFormat(),
+            $formatterOptions->getDateFormat(),
+            $formatterOptions->getAllowInlineLineBreaks(),
+            $formatterOptions->getIgnoreEmptyContextAndExtra()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, LineFormatter::class, $this->creationOptions);
     }
 }

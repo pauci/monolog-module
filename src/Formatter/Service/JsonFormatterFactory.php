@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\JsonFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\JsonFormatterOptions;
@@ -12,16 +13,23 @@ class JsonFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return JsonFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new JsonFormatterOptions($this->creationOptions);
+        $formatterOptions = new JsonFormatterOptions($options);
 
         return new JsonFormatter(
-            $options->getBatchMode(),
-            $options->getAppendNewline()
+            $formatterOptions->getBatchMode(),
+            $formatterOptions->getAppendNewline()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, JsonFormatter::class, $this->creationOptions);
     }
 }

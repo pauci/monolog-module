@@ -4,11 +4,11 @@ namespace MonologModuleTest\ServiceFactory;
 
 use Monolog\Logger;
 use MonologModuleTest\ServiceManagerFactory;
-use PHPUnit_Framework_TestCase;
+use PHPUnit_Framework_TestCase as TestCase;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class ModuleDefinedServicesTest extends PHPUnit_Framework_TestCase
+class ModuleDefinedServicesTest extends TestCase
 {
     /**
      * @var ServiceLocatorInterface
@@ -50,7 +50,7 @@ class ModuleDefinedServicesTest extends PHPUnit_Framework_TestCase
      */
     public function testModuleInvalidService($serviceName)
     {
-        $this->setExpectedException(ServiceNotFoundException::class);
+        $this->expectException(ServiceNotFoundException::class);
 
         $this->serviceManager->get($serviceName);
     }

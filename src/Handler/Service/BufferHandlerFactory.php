@@ -2,6 +2,7 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\BufferHandler;
 use Monolog\Handler\HandlerInterface;
 use MonologModule\Handler\Options\BufferHandlerOptions;
@@ -13,25 +14,32 @@ class BufferHandlerFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return BufferHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new BufferHandlerOptions($this->creationOptions);
+        $handlerOptions = new BufferHandlerOptions($options);
 
-        $handler = $options->getHandler();
+        $handler = $handlerOptions->getHandler();
         if (is_string($handler)) {
             /** @var HandlerInterface $handler */
-            $handler = $serviceLocator->get("monolog.handler.$handler");
+            $handler = $container->get("monolog.handler.$handler");
         }
 
         return new BufferHandler(
             $handler,
-            $options->getBufferLimit(),
-            $options->getLevel(),
-            $options->getBubble(),
-            $options->getFlushOnOverflow()
+            $handlerOptions->getBufferLimit(),
+            $handlerOptions->getLevel(),
+            $handlerOptions->getBubble(),
+            $handlerOptions->getFlushOnOverflow()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, BufferHandler::class, $this->creationOptions);
     }
 }

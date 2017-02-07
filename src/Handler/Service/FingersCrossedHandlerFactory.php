@@ -2,10 +2,11 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\FingersCrossedHandler;
 use MonologModule\Handler\Options\FingersCrossedHandlerOptions;
 use MonologModule\Service\AbstractPluginFactory;
-use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class FingersCrossedHandlerFactory extends AbstractPluginFactory
@@ -13,16 +14,18 @@ class FingersCrossedHandlerFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $serviceLocator
+     * @param string $requestedName
+     * @param array $options
      * @return FingersCrossedHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $serviceLocator, $requestedName, array $options = null)
     {
-        $options = new FingersCrossedHandlerOptions($this->creationOptions);
+        $handlerOptions = new FingersCrossedHandlerOptions($options);
 
-        $handler = $options->getHandler();
+        $handler = $handlerOptions->getHandler();
         if (is_string($handler)) {
-            if ($serviceLocator instanceof AbstractPluginManager) {
+            if ($serviceLocator instanceof ServiceLocatorAwareInterface) {
                 $serviceLocator = $serviceLocator->getServiceLocator();
             }
             $handler = function() use($serviceLocator, $handler) {
@@ -30,7 +33,7 @@ class FingersCrossedHandlerFactory extends AbstractPluginFactory
             };
         }
 
-        $activationStrategy = $options->getActivationStrategy();
+        $activationStrategy = $handlerOptions->getActivationStrategy();
         if (is_string($activationStrategy) && class_exists($activationStrategy)) {
             $activationStrategy = new $activationStrategy();
         }
@@ -38,9 +41,14 @@ class FingersCrossedHandlerFactory extends AbstractPluginFactory
         return new FingersCrossedHandler(
             $handler,
             $activationStrategy,
-            $options->getBufferSize(),
-            $options->getBubble(),
-            $options->getPassthruLevel()
+            $handlerOptions->getBufferSize(),
+            $handlerOptions->getBubble(),
+            $handlerOptions->getPassthruLevel()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, FingersCrossedHandler::class, $this->creationOptions);
     }
 }

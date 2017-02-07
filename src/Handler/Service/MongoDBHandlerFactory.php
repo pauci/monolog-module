@@ -2,6 +2,7 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\MongoDBHandler;
 use MonologModule\Handler\Options\MongoDBHandlerOptions;
 use MonologModule\Service\AbstractPluginFactory;
@@ -12,19 +13,26 @@ class MongoDBHandlerFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return MongoDBHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new MongoDBHandlerOptions($this->creationOptions);
+        $handlerOptions = new MongoDBHandlerOptions($options);
 
         return new MongoDBHandler(
-            $options->getMongo(),
-            $options->getDatabase(),
-            $options->getCollection(),
-            $options->getLevel(),
-            $options->getBubble()
+            $handlerOptions->getMongo(),
+            $handlerOptions->getDatabase(),
+            $handlerOptions->getCollection(),
+            $handlerOptions->getLevel(),
+            $handlerOptions->getBubble()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, MongoDBHandler::class, $this->creationOptions);
     }
 }

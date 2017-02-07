@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\GelfMessageFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\GelfMessageFormatterOptions;
@@ -12,17 +13,24 @@ class GelfMessageFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return GelfMessageFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new GelfMessageFormatterOptions($this->creationOptions);
+        $formatterOptions = new GelfMessageFormatterOptions($options);
 
         return new GelfMessageFormatter(
-            $options->getSystemName(),
-            $options->getExtraPrefix(),
-            $options->getContextPrefix()
+            $formatterOptions->getSystemName(),
+            $formatterOptions->getExtraPrefix(),
+            $formatterOptions->getContextPrefix()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, GelfMessageFormatter::class, $this->creationOptions);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace MonologModule\Handler\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Handler\RedisHandler;
 use MonologModule\Exception\InvalidArgumentException;
 use MonologModule\Handler\Options\RedisHandlerOptions;
 use MonologModule\Service\AbstractPluginFactory;
-use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class RedisHandlerFactory extends AbstractPluginFactory
@@ -14,22 +15,24 @@ class RedisHandlerFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return RedisHandler
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new RedisHandlerOptions($this->creationOptions);
+        $handlerOptions = new RedisHandlerOptions($options);
 
-        $redis = $options->getRedis();
+        $redis = $handlerOptions->getRedis();
         if (is_string($redis)) {
-            if ($serviceLocator instanceof AbstractPluginManager) {
-                $serviceLocator = $serviceLocator->getServiceLocator();
+            if ($container instanceof ServiceLocatorAwareInterface) {
+                $container = $container->getServiceLocator();
             }
-            $redis = $serviceLocator->get($redis);
+            $redis = $container->get($redis);
         }
 
-        $key = $options->getKey();
+        $key = $handlerOptions->getKey();
         if (!$key) {
             throw new InvalidArgumentException('Redis handler must have a key specified');
         }
@@ -37,8 +40,13 @@ class RedisHandlerFactory extends AbstractPluginFactory
         return new RedisHandler(
             $redis,
             $key,
-            $options->getLevel(),
-            $options->getBubble()
+            $handlerOptions->getLevel(),
+            $handlerOptions->getBubble()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, RedisHandler::class, $this->creationOptions);
     }
 }

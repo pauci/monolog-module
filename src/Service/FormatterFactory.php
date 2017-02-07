@@ -2,6 +2,7 @@
 
 namespace MonologModule\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\FormatterInterface;
 use MonologModule\Formatter\FormatterPluginManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -11,17 +12,24 @@ class FormatterFactory extends AbstractFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return FormatterInterface
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = $this->getOptions($serviceLocator, 'formatter');
+        $options = $this->getOptions($container, 'formatter');
 
         $type = isset($options['type']) ? $options['type'] : $this->getName();
         unset($options['type']);
 
-        return $serviceLocator->get(FormatterPluginManager::class)
+        return $container->get(FormatterPluginManager::class)
             ->get($type, $options);
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, FormatterInterface::class);
     }
 }

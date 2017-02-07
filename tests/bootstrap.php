@@ -15,7 +15,7 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 
 
 if (file_exists(__DIR__ . '/configuration.php')) {
-    $config = require __DIR__ . '/configuration.php';
+    $config = require __DIR__ . '/configuration.v2.php';
 } else {
     $config = require __DIR__ . '/configuration.php.dist';
 }

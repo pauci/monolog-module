@@ -2,6 +2,7 @@
 
 namespace MonologModule\Formatter\Service;
 
+use Interop\Container\ContainerInterface;
 use Monolog\Formatter\NormalizerFormatter;
 use MonologModule\Service\AbstractPluginFactory;
 use MonologModule\Formatter\Options\NormalizerFormatterOptions;
@@ -12,15 +13,22 @@ class NormalizerFormatterFactory extends AbstractPluginFactory
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array $options
      * @return NormalizerFormatter
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = new NormalizerFormatterOptions($this->creationOptions);
+        $formatterOptions = new NormalizerFormatterOptions($options);
 
         return new NormalizerFormatter(
-            $options->getDateFormat()
+            $formatterOptions->getDateFormat()
         );
+    }
+
+    public function createService(ServiceLocatorInterface $serviceLocator)
+    {
+        return $this($serviceLocator, NormalizerFormatter::class, $this->creationOptions);
     }
 }
