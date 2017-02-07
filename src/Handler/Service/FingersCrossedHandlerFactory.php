@@ -28,7 +28,7 @@ class FingersCrossedHandlerFactory extends AbstractPluginFactory
             if ($serviceLocator instanceof ServiceLocatorAwareInterface) {
                 $serviceLocator = $serviceLocator->getServiceLocator();
             }
-            $handler = function() use($serviceLocator, $handler) {
+            $handler = function () use ($serviceLocator, $handler) {
                 return $serviceLocator->get("monolog.handler.$handler");
             };
         }

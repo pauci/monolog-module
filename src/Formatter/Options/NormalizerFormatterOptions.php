@@ -26,4 +26,4 @@ class NormalizerFormatterOptions extends AbstractOptions
     {
         return $this->dateFormat;
     }
-} 
+}

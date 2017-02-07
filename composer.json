@@ -28,11 +28,21 @@
         "zendframework/zend-i18n": "^2.7.3",
         "phpunit/phpunit": "^5.7.11",
         "predis/predis": "^1.1",
-        "ruflin/elastica": "^1.4"
+        "ruflin/elastica": "^1.4",
+        "squizlabs/php_codesniffer": "^2.5"
     },
     "extra": {
         "branch-alias": {
             "dev-master": "0.1.x-dev"
         }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit"
     }
 }

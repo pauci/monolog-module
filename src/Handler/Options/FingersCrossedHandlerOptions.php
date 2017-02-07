@@ -111,4 +111,4 @@ class FingersCrossedHandlerOptions extends CommonHandlerOptions
     {
         return $this->passthruLevel;
     }
-} 
+}
